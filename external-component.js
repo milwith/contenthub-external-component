@@ -1,21 +1,22 @@
 (function () {
-    // Create a container
-    var container = document.createElement("div");
+    // Content Hub calls this function automatically
+    window.ExternalComponent = function (options) {
 
-    // Style it a bit
-    container.style.padding = "16px";
-    container.style.border = "2px solid #4CAF50";
-    container.style.borderRadius = "8px";
-    container.style.fontFamily = "Arial";
-    container.style.backgroundColor = "#f9f9f9";
+        // options.element is the container provided by Content Hub
+        var container = options.element;
 
-    // Add content
-    container.innerHTML = `
-        <h2>✅ External Component Loaded</h2>
-        <p>This component is loaded from GitHub.</p>
-        <p>If you can see this, your setup works 🎉</p>
-    `;
-
-    // Add it to Content Hub page
-    document.body.appendChild(container);
+        container.innerHTML = `
+            <div style="
+                padding:16px;
+                border:2px solid #4CAF50;
+                border-radius:8px;
+                font-family:Arial;
+                background:#f9f9f9;">
+                
+                <h2>✅ External Component Loaded</h2>
+                <p>Loaded from GitHub Pages</p>
+                <p>If you see this, everything works 🎉</p>
+            </div>
+        `;
+    };
 })();
