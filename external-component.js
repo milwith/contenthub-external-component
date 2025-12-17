@@ -1,22 +1,34 @@
-(function () {
-    // Content Hub calls this function automatically
-    window.ExternalComponent = function (options) {
+export default function createExternalRoot(container, clientBuilder) {
 
-        // options.element is the container provided by Content Hub
-        var container = options.element;
+  // Initial HTML
+  container.innerHTML = `
+    <div id="entity-api-container" style="padding:12px;font-family:Arial"></div>
+  `;
 
-        container.innerHTML = `
-            <div style="
-                padding:16px;
-                border:2px solid #4CAF50;
-                border-radius:8px;
-                font-family:Arial;
-                background:#f9f9f9;">
-                
-                <h2>✅ External Component Loaded</h2>
-                <p>Loaded from GitHub Pages</p>
-                <p>If you see this, everything works 🎉</p>
-            </div>
-        `;
-    };
-})();
+  function render(props) {
+    const entityId =
+      props?.options?.entityId ||
+      props?.entity?.systemProperties?.id;
+
+    if (!entityId) {
+      container.innerHTML = "No entity context available";
+      return;
+    }
+
+    container.querySelector("#entity-api-container").innerHTML = `
+      <strong>Entity API URL</strong><br/>
+      <a href="/api/entities/${entityId}" target="_blank">
+        /api/entities/${entityId}
+      </a>
+    `;
+  }
+
+  function unmount() {
+    container.innerHTML = "";
+  }
+
+  return {
+    render,
+    unmount
+  };
+}
