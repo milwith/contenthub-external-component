@@ -1,25 +1,22 @@
-export default function createExternalRoot(container, clientBuilder) {
+(function () {
+    // Content Hub calls this function automatically
+    window.ExternalComponent = function (options) {
 
-  container.innerHTML = `
-    <div id="entity-api-container" style="padding:12px"></div>
-  `;
+        // options.element is the container provided by Content Hub
+        var container = options.element;
 
-  function render(context) {
-    const entityId = context?.page?.entity?.id;
-    if (!entityId) return;
-
-    container.querySelector("#entity-api-container").innerHTML = `
-      <strong>Entity API URL:</strong><br/>
-      <a href="/api/entities/${entityId}" target="_blank">
-        /api/entities/${entityId}
-      </a>
-    `;
-  }
-
-  return {
-    render,
-    unmount() {
-      container.innerHTML = "";
-    }
-  };
-}
+        container.innerHTML = `
+            <div style="
+                padding:16px;
+                border:2px solid #4CAF50;
+                border-radius:8px;
+                font-family:Arial;
+                background:#f9f9f9;">
+                
+                <h2>✅ External Component Loaded</h2>
+                <p>Loaded from GitHub Pages</p>
+                <p>If you see this, everything works 🎉</p>
+            </div>
+        `;
+    };
+})();
