@@ -4,7 +4,7 @@ export default function createExternalRoot(container, clientBuilder) {
     <div id="entity-api-container" style="padding:12px;font-family:Arial"></div>
   `;
 
-  // 🔹 Render helper
+  //  Render helper
   function renderEntity(entityId) {
     if (!entityId) {
       container.innerHTML = "No entity context available";
@@ -19,7 +19,7 @@ export default function createExternalRoot(container, clientBuilder) {
     `;
   }
 
-  // 🔹 Initial render (existing entity)
+  //  Initial render (existing entity)
   function render(props) {
     const entityId =
       props?.options?.entityId ||
@@ -28,7 +28,7 @@ export default function createExternalRoot(container, clientBuilder) {
     renderEntity(entityId);
   }
 
-  // 🔹 Subscribe to ENTITY_CREATED (DOCUMENTATION WAY)
+  //  Subscribe to ENTITY_CREATED
   const onEntityCreated = (evt) => {
     const { definitionName, id } = evt.detail;
 
