@@ -4,13 +4,8 @@ export default function createExternalRoot(container, clientBuilder) {
     <div id="entity-api-container" style="padding:12px;font-family:Arial"></div>
   `;
 
-  let unsubscribe;
-
-  function render(props) {
-    const entityId =
-      props?.options?.entityId ||
-      props?.entity?.systemProperties?.id;
-
+  // 🔹 Render helper
+  function renderEntity(entityId) {
     if (!entityId) {
       container.innerHTML = "No entity context available";
       return;
@@ -24,25 +19,29 @@ export default function createExternalRoot(container, clientBuilder) {
     `;
   }
 
-  // Subscribe to entityCreated
-  clientBuilder.getClient().then(client => {
-    unsubscribe = client.events.subscribe("entityCreated", event => {
-      if (event.entityDefinition === "M.Asset") {
-        render({
-          entity: {
-            systemProperties: {
-              id: event.entityId
-            }
-          }
-        });
-      }
-    });
-  });
+  // 🔹 Initial render (existing entity)
+  function render(props) {
+    const entityId =
+      props?.options?.entityId ||
+      props?.entity?.systemProperties?.id;
+
+    renderEntity(entityId);
+  }
+
+  // 🔹 Subscribe to ENTITY_CREATED (DOCUMENTATION WAY)
+  const onEntityCreated = (evt) => {
+    const { definitionName, id } = evt.detail;
+
+    // Only react to Assets
+    if (definitionName === "M.Asset" && id) {
+      renderEntity(id);
+    }
+  };
+
+  window.addEventListener("ENTITY_CREATED", onEntityCreated);
 
   function unmount() {
-    if (unsubscribe) {
-      unsubscribe();
-    }
+    window.removeEventListener("ENTITY_CREATED", onEntityCreated);
     container.innerHTML = "";
   }
 
