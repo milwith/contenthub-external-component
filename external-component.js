@@ -1,56 +1,73 @@
-// 💥 ADD THIS LINE AT THE TOP 💥
-alert("Component Script is running!");
 export default function createExternalRoot(container, clientBuilder) {
-  // 1. Log immediately to confirm the component itself is even loading
-  console.log("External Component Initializing...");
+
+  console.log("[ExternalComponent] createExternalRoot initialized");
 
   container.innerHTML = `
-    
-      Waiting for Entity Created event...
-    </div>
+    <div id="entity-api-container" style="padding:12px;font-family:Arial"></div>
   `;
 
+  // Render helper
   function renderEntity(entityId) {
-    console.log("Updating UI for ID:", entityId);
-    const target = container.querySelector("#entity-api-container");
-    if (target) {
-      target.innerHTML = `
-        <strong>New Entity API URL</strong><br/>
-        /api/entities/${entityId}</a>
-      `;
+    console.log("[ExternalComponent] renderEntity called with entityId:", entityId);
+
+    if (!entityId) {
+      console.warn("[ExternalComponent] No entityId available");
+      container.innerHTML = "No entity context available";
+      return;
     }
+
+    container.querySelector("#entity-api-container").innerHTML = `
+      <strong>Entity API URL</strong><br/>
+      <a href="/api/entities/${entityId}" target="_blank">
+        /api/entities/${entityId}
+      </a>
+    `;
   }
 
-  // 🔹 Define the listener
+  // Initial render (existing entity)
+  function render(props) {
+    console.log("[ExternalComponent] render called with props:", props);
+
+    const entityId =
+      props?.options?.entityId ||
+      props?.entity?.systemProperties?.id;
+
+    console.log("[ExternalComponent] resolved entityId:", entityId);
+    renderEntity(entityId);
+  }
+
+  // Subscribe to ENTITY_CREATED
   const onEntityCreated = (evt) => {
-    // This will log ANY entity creation to help you see the exact definitionName
-    console.log("ENTITY_CREATED Event Detected!", evt.detail);
+    console.log("[ExternalComponent] ENTITY_CREATED event received:", evt);
 
-    const { definitionName, id } = evt.detail;
+    const { definitionName, id } = evt.detail || {};
+    console.log(
+      "[ExternalComponent] ENTITY_CREATED details → definition:",
+      definitionName,
+      "id:",
+      id
+    );
 
-    // Sitecore often uses 'M.Asset' (Case sensitive)
+    // Only react to Assets
     if (definitionName === "M.Asset" && id) {
-      console.log("Success: Asset detected. Triggering render.");
+      console.log("[ExternalComponent] Matching entity detected. Rendering entity.");
       renderEntity(id);
     } else {
-      console.warn(`Event skipped: definitionName was '${definitionName}', expected 'M.Asset'`);
+      console.log("[ExternalComponent] Entity ignored (not M.Asset)");
     }
   };
 
-  // 🔹 Subscribe to window-level events (Standard for Content Hub 4.2+)
+  console.log("[ExternalComponent] Subscribing to ENTITY_CREATED event");
   window.addEventListener("ENTITY_CREATED", onEntityCreated);
-  console.log("Listener attached to window: ENTITY_CREATED");
+
+  function unmount() {
+    console.log("[ExternalComponent] unmount called. Removing event listener");
+    window.removeEventListener("ENTITY_CREATED", onEntityCreated);
+    container.innerHTML = "";
+  }
 
   return {
-    render(props) {
-      console.log("Initial Render Props:", props);
-      const entityId = props?.options?.entityId || props?.entity?.systemProperties?.id;
-      if (entityId) renderEntity(entityId);
-    },
-    unmount() {
-      console.log("Unmounting: Removing listener");
-      window.removeEventListener("ENTITY_CREATED", onEntityCreated);
-      container.innerHTML = "";
-    }
+    render,
+    unmount
   };
 }
