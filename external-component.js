@@ -1,9 +1,10 @@
 export default function createExternalRoot(container, clientBuilder) {
 
-  // Initial HTML
   container.innerHTML = `
     <div id="entity-api-container" style="padding:12px;font-family:Arial"></div>
   `;
+
+  let unsubscribe;
 
   function render(props) {
     const entityId =
@@ -23,7 +24,25 @@ export default function createExternalRoot(container, clientBuilder) {
     `;
   }
 
+  // Subscribe to entityCreated
+  clientBuilder.getClient().then(client => {
+    unsubscribe = client.events.subscribe("entityCreated", event => {
+      if (event.entityDefinition === "M.Asset") {
+        render({
+          entity: {
+            systemProperties: {
+              id: event.entityId
+            }
+          }
+        });
+      }
+    });
+  });
+
   function unmount() {
+    if (unsubscribe) {
+      unsubscribe();
+    }
     container.innerHTML = "";
   }
 
