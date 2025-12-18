@@ -1,3 +1,5 @@
+// 💥 ADD THIS LINE AT THE TOP 💥
+alert("Component Script is running!");
 export default function createExternalRoot(container, clientBuilder) {
   // 1. Log immediately to confirm the component itself is even loading
   console.log("External Component Initializing...");
